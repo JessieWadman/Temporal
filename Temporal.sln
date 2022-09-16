@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32825.248
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2B3218E6-223E-4494-8EB5-3B4C74B43DA3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{EEDE5163-3E35-470A-A003-842FFF74898E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{6A375B2B-4945-4D3B-84C7-C63A0C330F9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temporal.Abstractions", "src\Temporal.Abstractions\Temporal.Abstractions.csproj", "{C24F1AE4-1BFE-41B6-97A9-595150FEC915}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temporal.MsSql", "src\Temporal.MsSql\Temporal.MsSql.csproj", "{5B442AC7-3DBE-4E13-BD98-212D497CDA0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temporal.AmazonDynamoDB", "src\Temporal.AmazonDynamoDB\Temporal.AmazonDynamoDB.csproj", "{3151FDB3-3E91-4AEF-B857-9A9D27D56622}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temporal.Abstractions.Tests", "test\Temporal.Abstractions.Tests\Temporal.Abstractions.Tests.csproj", "{39DECB8F-732D-409F-B369-1EC6E4378ECA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C24F1AE4-1BFE-41B6-97A9-595150FEC915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C24F1AE4-1BFE-41B6-97A9-595150FEC915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C24F1AE4-1BFE-41B6-97A9-595150FEC915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C24F1AE4-1BFE-41B6-97A9-595150FEC915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B442AC7-3DBE-4E13-BD98-212D497CDA0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B442AC7-3DBE-4E13-BD98-212D497CDA0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B442AC7-3DBE-4E13-BD98-212D497CDA0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B442AC7-3DBE-4E13-BD98-212D497CDA0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3151FDB3-3E91-4AEF-B857-9A9D27D56622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3151FDB3-3E91-4AEF-B857-9A9D27D56622}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3151FDB3-3E91-4AEF-B857-9A9D27D56622}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3151FDB3-3E91-4AEF-B857-9A9D27D56622}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39DECB8F-732D-409F-B369-1EC6E4378ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39DECB8F-732D-409F-B369-1EC6E4378ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39DECB8F-732D-409F-B369-1EC6E4378ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39DECB8F-732D-409F-B369-1EC6E4378ECA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C24F1AE4-1BFE-41B6-97A9-595150FEC915} = {2B3218E6-223E-4494-8EB5-3B4C74B43DA3}
+		{5B442AC7-3DBE-4E13-BD98-212D497CDA0B} = {2B3218E6-223E-4494-8EB5-3B4C74B43DA3}
+		{3151FDB3-3E91-4AEF-B857-9A9D27D56622} = {2B3218E6-223E-4494-8EB5-3B4C74B43DA3}
+		{39DECB8F-732D-409F-B369-1EC6E4378ECA} = {EEDE5163-3E35-470A-A003-842FFF74898E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D09BDB37-1851-4AC8-8283-B00937C7F846}
+	EndGlobalSection
+EndGlobal
