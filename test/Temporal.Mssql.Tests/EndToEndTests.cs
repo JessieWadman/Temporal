@@ -1,11 +1,12 @@
 using System.Collections.Immutable;
 using Temporal.Internal;
+using Temporal.Mssql.Tests.Helpers;
 using Temporal.Notifications;
 using Temporal.Storage;
 
 namespace Temporal.Mssql.Tests
 {
-    public class SqlTests
+    public class EndToEndTests
     {
         [Fact]
         public async Task ShouldWork()

@@ -95,7 +95,7 @@ namespace Temporal.Storage
         {
             await using var connection = CreateConnection();
             await connection.OpenAsync(cancellationToken);
-            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE [TypeName] = @typeName AND [Identity] = @identity AND [EffectiveTimestampUtc] >= @fromUtc AND [EffectiveTimestampUtc] <= @toUtc",
+            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE [TypeName] = @typeName AND [Identity] = @identity AND [EffectiveTimestampUtc] >= @fromUtc AND [EffectiveTimestampUtc] <= @toUtc ORDER BY [EffectiveTimestampUtc], [ChangeId]",
                 new { @typeName, @identity, @fromUtc, @toUtc });
             foreach (var change in result)
             {
@@ -116,7 +116,7 @@ namespace Temporal.Storage
             ChangeSet[] changes;
             try
             {
-                var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE EffectiveTimestampUtc <= @toUtc",
+                var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE [EffectiveTimestampUtc] <= @toUtc ORDER BY [EffectiveTimestampUtc], [ChangeId]",
                     new { @toUtc });
 
                 changes = result.Select(change => new ChangeSet(change.ChangeId, change.TypeName, change.EffectiveTimestampUtc, change.Identity,
@@ -139,7 +139,7 @@ namespace Temporal.Storage
         {
             await using var connection = CreateConnection();
             await connection.OpenAsync(cancellationToken);
-            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE ChangeId > @fromChangeSetId",
+            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE ChangeId > @fromChangeSetId ORDER BY [EffectiveTimestampUtc], [ChangeId]",
                 new { fromChangeSetId });
 
             foreach (var change in result)

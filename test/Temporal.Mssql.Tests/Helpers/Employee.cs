@@ -1,4 +1,4 @@
-﻿namespace Temporal.Mssql.Tests
+﻿namespace Temporal.Mssql.Tests.Helpers
 {
     public class Employee
     {
