@@ -3,7 +3,7 @@ using Temporal.Internal;
 
 namespace Temporal.InMemory
 {
-    public class InMemoryRepositry : IEntityChangeApplier
+    public class InMemoryRepositry : IChangeApplier
     {
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> typeToIdentityToEntities = new();
 

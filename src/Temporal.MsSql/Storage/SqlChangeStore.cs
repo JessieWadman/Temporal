@@ -12,6 +12,7 @@ namespace Temporal.Storage
     {
         private readonly string connectionString;
         private readonly string tableName;
+        private readonly string schemaName;
 
         private class ChangeSetDto
         {
@@ -23,10 +24,11 @@ namespace Temporal.Storage
             public string UserInfo { get; set; }
         }
 
-        public SqlChangeStore(string connectionString, string tableName)
+        public SqlChangeStore(string connectionString, string tableName, string schemaName = "dbo")
         {
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             this.tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
+            this.schemaName = schemaName ?? throw new ArgumentNullException(nameof(schemaName));
         }
 
         private SqlConnection CreateConnection()
@@ -34,12 +36,34 @@ namespace Temporal.Storage
             return new SqlConnection(connectionString);
         }
 
-        public async ValueTask DeleteChangeSetAsync(long changeSetId, CancellationToken cancellationToken)
+        public async Task CreateTable()
+        {
+            await using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            await connection.ExecuteAsync(
+                $@"CREATE TABLE [{schemaName}].[{tableName}]
+                (
+	                [ChangeId] BIGINT NOT NULL PRIMARY KEY, 
+                    [TypeName] NVARCHAR(1024) NOT NULL, 
+                    [EffectiveTimestampUtc] DATETIME NOT NULL, 
+                    [Identity] NVARCHAR(1024) NOT NULL, 
+                    [Changes] NVARCHAR(MAX) NOT NULL, 
+                    [UserInfo] NVARCHAR(MAX) NULL
+                );");
+
+            await connection.ExecuteAsync($"CREATE INDEX [IX_{tableName}_TypeName_Identity_EffectiveTimestampUtc] ON [{schemaName}].[{tableName}] ([TypeName], [Identity], [EffectiveTimestampUtc]);");
+            await connection.ExecuteAsync($"CREATE INDEX [IX_{tableName}_TypeName_EffectiveTimestampUtc] ON [{schemaName}].[{tableName}] ([EffectiveTimestampUtc]);");
+        }
+
+        public async ValueTask DeleteChangeSetAsync(long changeId, CancellationToken cancellationToken)
         {
             await using var connection = CreateConnection();
             await connection.OpenAsync(cancellationToken);
-            await connection.ExecuteAsync($"DELETE FROM {tableName} WHERE ChangeSetId = @changeSetId", new { @changeSetId });
+            await connection.ExecuteAsync($"DELETE FROM [{schemaName}].[{tableName}] WHERE [ChangeId] = @changeId", new { changeId });
         }
+
+        private static readonly DateTime MinSqlDateTime = new DateTime(1900, 01, 01);
 
         public async ValueTask EnqueueChangesAsync(CancellationToken cancellationToken, params ChangeSet[] changes)
         {
@@ -53,8 +77,10 @@ namespace Temporal.Storage
                 var dp = new DynamicParameters();
                 foreach (var changeSet in batch)
                 {
-                    sb.AppendLine($"INSERT INTO {tableName} (ChangeSetId, TypeName, Identity, Changes, UserInfo) VALUES (@changeSet{idx}, @typeName{idx}, @identity{idx}, @changes{idx}, @userInfo{idx});");
+                    sb.AppendLine($"INSERT INTO [{schemaName}].[{tableName}] ([ChangeId], [EffectiveTimestampUtc], [TypeName], [Identity], [Changes], [UserInfo]) VALUES (@changeSet{idx}, @effectiveTimestampUtc{idx}, @typeName{idx}, @identity{idx}, @changes{idx}, @userInfo{idx});");
                     dp.Add($"changeSet{idx}", changeSet.ChangeId);
+                    dp.Add($"effectiveTimestampUtc{idx}",
+                        changeSet.EffectiveTimestampUtc < MinSqlDateTime ? MinSqlDateTime : changeSet.EffectiveTimestampUtc);
                     dp.Add($"typeName{idx}", changeSet.TypeName);
                     dp.Add($"identity{idx}", changeSet.Identity);
                     dp.Add($"changes{idx}", JsonSerializer.Serialize(changeSet.Changes));
@@ -62,14 +88,14 @@ namespace Temporal.Storage
                 }
 
                 await connection.ExecuteAsync(sb.ToString(), dp);
-            }            
+            }
         }
 
         public async IAsyncEnumerable<ChangeSet> GetChangeSetsAsync(string typeName, string identity, DateTime fromUtc, DateTime toUtc, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             await using var connection = CreateConnection();
             await connection.OpenAsync(cancellationToken);
-            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * {tableName} WHERE TypeName = @typeName AND Identity = @identity AND EffectiveTimestampUtc >= @fromUtc AND EffectiveTimestampUtc <= @toUtc",
+            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE [TypeName] = @typeName AND [Identity] = @identity AND [EffectiveTimestampUtc] >= @fromUtc AND [EffectiveTimestampUtc] <= @toUtc",
                 new { @typeName, @identity, @fromUtc, @toUtc });
             foreach (var change in result)
             {
@@ -79,17 +105,33 @@ namespace Temporal.Storage
             }
         }
 
-        public async IAsyncEnumerable<ChangeSet> GetChangeSetsAsync(DateTime fromUtc, DateTime toUtc, [EnumeratorCancellation] CancellationToken cancellationToken)
+        private static readonly DateTime MaxDateTime = new DateTime(2900, 01, 01);
+
+        public async IAsyncEnumerable<ChangeSet> GetChangeSetsAsync(DateTime toUtc, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
+            if (toUtc > MaxDateTime)
+                toUtc = MaxDateTime;
             await using var connection = CreateConnection();
             await connection.OpenAsync(cancellationToken);
-            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * {tableName} WHERE EffectiveTimestampUtc >= @fromUtc AND EffectiveTimestampUtc <= @toUtc",
-                new { @fromUtc, @toUtc });
-            foreach (var change in result)
+            ChangeSet[] changes;
+            try
             {
-                yield return new ChangeSet(change.ChangeId, change.TypeName, change.EffectiveTimestampUtc, change.Identity,
-                    JsonSerializer.Deserialize<ImmutableDictionary<string, string>>(change.Changes)!,
-                    JsonSerializer.Deserialize<ImmutableDictionary<string, string>>(change.UserInfo)!);
+                var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE EffectiveTimestampUtc <= @toUtc",
+                    new { @toUtc });
+
+                changes = result.Select(change => new ChangeSet(change.ChangeId, change.TypeName, change.EffectiveTimestampUtc, change.Identity,
+                        JsonSerializer.Deserialize<ImmutableDictionary<string, string>>(change.Changes)!,
+                        JsonSerializer.Deserialize<ImmutableDictionary<string, string>>(change.UserInfo)!))
+                    .ToArray();
+            }
+            catch (Exception error)
+            {
+                throw;
+            }
+
+            foreach (var change in changes)
+            {
+                yield return change;
             }
         }
 
@@ -97,7 +139,7 @@ namespace Temporal.Storage
         {
             await using var connection = CreateConnection();
             await connection.OpenAsync(cancellationToken);
-            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * {tableName} WHERE ChangeId > @fromChangeSetId",
+            var result = await connection.QueryAsync<ChangeSetDto>($"SELECT * FROM [{schemaName}].[{tableName}] WHERE ChangeId > @fromChangeSetId",
                 new { fromChangeSetId });
 
             foreach (var change in result)

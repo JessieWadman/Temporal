@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temporal.AmazonDynamoDB", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temporal.Abstractions.Tests", "test\Temporal.Abstractions.Tests\Temporal.Abstractions.Tests.csproj", "{39DECB8F-732D-409F-B369-1EC6E4378ECA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temporal.Mssql.Tests", "test\Temporal.Mssql.Tests\Temporal.Mssql.Tests.csproj", "{7DBE20E0-60F1-47AD-9E0E-2B6E3C6A9696}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{39DECB8F-732D-409F-B369-1EC6E4378ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39DECB8F-732D-409F-B369-1EC6E4378ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39DECB8F-732D-409F-B369-1EC6E4378ECA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DBE20E0-60F1-47AD-9E0E-2B6E3C6A9696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DBE20E0-60F1-47AD-9E0E-2B6E3C6A9696}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DBE20E0-60F1-47AD-9E0E-2B6E3C6A9696}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DBE20E0-60F1-47AD-9E0E-2B6E3C6A9696}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{5B442AC7-3DBE-4E13-BD98-212D497CDA0B} = {2B3218E6-223E-4494-8EB5-3B4C74B43DA3}
 		{3151FDB3-3E91-4AEF-B857-9A9D27D56622} = {2B3218E6-223E-4494-8EB5-3B4C74B43DA3}
 		{39DECB8F-732D-409F-B369-1EC6E4378ECA} = {EEDE5163-3E35-470A-A003-842FFF74898E}
+		{7DBE20E0-60F1-47AD-9E0E-2B6E3C6A9696} = {EEDE5163-3E35-470A-A003-842FFF74898E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D09BDB37-1851-4AC8-8283-B00937C7F846}

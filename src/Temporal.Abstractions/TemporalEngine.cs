@@ -6,6 +6,6 @@ namespace Temporal
     {
         public IChangeStore PendingChanges { get; init; }
         public IChangeStore? AppliedChanges { get; init; }
-        public IEntityChangeApplier Repository { get; init; }
+        public IChangeApplier Repository { get; init; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Temporal;
 
-public interface IEntityChangeApplier
+public interface IChangeApplier
 {
     ValueTask ApplyAsync(ChangeSet changeSet, CancellationToken cancellationToken);
 }

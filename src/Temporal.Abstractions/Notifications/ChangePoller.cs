@@ -61,7 +61,7 @@ namespace Temporal.Notifications
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await foreach (var change in Store.GetChangeSetsAsync(DateTime.MinValue, systemClock.UtcNow, cancellationToken))
+                await foreach (var change in Store.GetChangeSetsAsync(systemClock.UtcNow, cancellationToken))
                 {
                     foreach (var receiver in changeReceivers)
                         await RetryForever(async () => await receiver.PushAsync(change, cancellationToken), cancellationToken);

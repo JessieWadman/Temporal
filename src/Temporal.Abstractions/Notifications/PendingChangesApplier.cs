@@ -2,9 +2,9 @@
 {
     internal class PendingChangesApplier : ChangeReceiver
     {
-        private readonly IEntityChangeApplier changeApplier;
+        private readonly IChangeApplier changeApplier;
 
-        public PendingChangesApplier(IEntityChangeApplier changeApplier)
+        public PendingChangesApplier(IChangeApplier changeApplier)
         {
             this.changeApplier = changeApplier ?? throw new ArgumentNullException(nameof(changeApplier));
         }

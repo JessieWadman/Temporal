@@ -44,12 +44,11 @@ namespace Temporal.InMemory
         }
 
         public async IAsyncEnumerable<ChangeSet> GetChangeSetsAsync(
-            DateTime fromUtc,
             DateTime toUtc,
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var query = changes.Values
-                .Where(c => c.EffectiveTimestampUtc >= fromUtc && c.EffectiveTimestampUtc <= toUtc)
+                .Where(c => c.EffectiveTimestampUtc <= toUtc)
                 .OrderBy(c => c.EffectiveTimestampUtc)
                 .ThenBy(c => c.ChangeId)
                 .ToArray();
